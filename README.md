@@ -1,3 +1,7 @@
+# Test Centre Tokens
+
+Fork of [centre-tokens](https://github.com/centrehq/centre-tokens) that's removed who can protections regarding who can mint new tokens.
+
 # centre-tokens
 
 Fiat tokens on the [CENTRE](https://centre.io) network.

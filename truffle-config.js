@@ -44,6 +44,10 @@ module.exports = {
       provider: infuraProvider("ropsten"),
       network_id: 3,
     },
+    goerli: {
+      provider: infuraProvider("goerli"),
+      network_id: 5,
+    }
   },
   mocha: {
     timeout: 60000, // prevents tests from failing when pc is under heavy load

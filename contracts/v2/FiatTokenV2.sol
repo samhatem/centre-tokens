@@ -44,7 +44,7 @@ contract FiatTokenV2 is FiatTokenV1_1, EIP3009, EIP2612 {
      */
     function initializeV2(string calldata newName) external {
         // solhint-disable-next-line reason-string
-        require(initialized && _initializedVersion == 0);
+        require(initialized && _initializedVersion != 1);
         name = newName;
         DOMAIN_SEPARATOR = EIP712.makeDomainSeparator(newName, "2");
         _initializedVersion = 1;

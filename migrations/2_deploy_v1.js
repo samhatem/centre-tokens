@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const some = require("lodash/some");
 
-const FiatTokenV1 = artifacts.require("FiatTokenV1");
+const FiatTokenV2_1 = artifacts.require("FiatTokenV2_1");
 const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 
 const THROWAWAY_ADDRESS = "0x0000000000000000000000000000000000000001";
@@ -55,12 +55,12 @@ module.exports = async (deployer, network) => {
   }
 
   console.log("Deploying implementation contract...");
-  await deployer.deploy(FiatTokenV1);
-  const fiatTokenV1 = await FiatTokenV1.deployed();
-  console.log("Deployed implementation contract at", FiatTokenV1.address);
+  await deployer.deploy(FiatTokenV2_1);
+  const fiatTokenV2_1 = await FiatTokenV2_1.deployed();
+  console.log("Deployed implementation contract at", FiatTokenV2_1.address);
 
   console.log("Initializing implementation contract with dummy values...");
-  await fiatTokenV1.initialize(
+  await fiatTokenV2_1.initialize(
     "",
     "",
     "",
@@ -70,9 +70,11 @@ module.exports = async (deployer, network) => {
     THROWAWAY_ADDRESS,
     THROWAWAY_ADDRESS
   );
+  await fiatTokenV2_1.initializeV2("");
+  await fiatTokenV2_1.initializeV2_1(THROWAWAY_ADDRESS);
 
   console.log("Deploying proxy contract...");
-  await deployer.deploy(FiatTokenProxy, FiatTokenV1.address);
+  await deployer.deploy(FiatTokenProxy, FiatTokenV2_1.address);
   const fiatTokenProxy = await FiatTokenProxy.deployed();
   console.log("Deployed proxy contract at", FiatTokenProxy.address);
 
@@ -84,8 +86,8 @@ module.exports = async (deployer, network) => {
   console.log("Initializing proxy contract...");
   // Pretend that the proxy address is a FiatTokenV1 - this is fine because the
   // proxy will forward all the calls to the FiatTokenV1 impl
-  const proxyAsV1 = await FiatTokenV1.at(FiatTokenProxy.address);
-  await proxyAsV1.initialize(
+  const proxyAsV2_1 = await FiatTokenV2_1.at(FiatTokenProxy.address);
+  await proxyAsV2_1.initialize(
     "USD//C",
     "USDC",
     "USD",
@@ -95,4 +97,8 @@ module.exports = async (deployer, network) => {
     blacklisterAddress,
     ownerAddress
   );
+  console.log("init v2");
+  await fiatTokenV2_1.initializeV2("USD Coin");
+  console.log("init v2.1");
+  await fiatTokenV2_1.initializeV2_1(THROWAWAY_ADDRESS);
 };
