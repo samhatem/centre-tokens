@@ -3,7 +3,6 @@ const path = require("path");
 const some = require("lodash/some");
 
 const FiatTokenV2_1 = artifacts.require("FiatTokenV2_1");
-const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 
 const THROWAWAY_ADDRESS = "0x0000000000000000000000000000000000000001";
 
@@ -59,35 +58,8 @@ module.exports = async (deployer, network) => {
   const fiatTokenV2_1 = await FiatTokenV2_1.deployed();
   console.log("Deployed implementation contract at", FiatTokenV2_1.address);
 
-  console.log("Initializing implementation contract with dummy values...");
+  console.log("Initializing implementation contract...");
   await fiatTokenV2_1.initialize(
-    "",
-    "",
-    "",
-    0,
-    THROWAWAY_ADDRESS,
-    THROWAWAY_ADDRESS,
-    THROWAWAY_ADDRESS,
-    THROWAWAY_ADDRESS
-  );
-  await fiatTokenV2_1.initializeV2("");
-  await fiatTokenV2_1.initializeV2_1(THROWAWAY_ADDRESS);
-
-  console.log("Deploying proxy contract...");
-  await deployer.deploy(FiatTokenProxy, FiatTokenV2_1.address);
-  const fiatTokenProxy = await FiatTokenProxy.deployed();
-  console.log("Deployed proxy contract at", FiatTokenProxy.address);
-
-  console.log("Reassigning proxy contract admin...");
-  // need to change admin first, or the call to initialize won't work
-  // since admin can only call methods in the proxy, and not forwarded methods
-  await fiatTokenProxy.changeAdmin(proxyAdminAddress);
-
-  console.log("Initializing proxy contract...");
-  // Pretend that the proxy address is a FiatTokenV1 - this is fine because the
-  // proxy will forward all the calls to the FiatTokenV1 impl
-  const proxyAsV2_1 = await FiatTokenV2_1.at(FiatTokenProxy.address);
-  await proxyAsV2_1.initialize(
     "USD//C",
     "USDC",
     "USD",
@@ -97,8 +69,6 @@ module.exports = async (deployer, network) => {
     blacklisterAddress,
     ownerAddress
   );
-  console.log("init v2");
   await fiatTokenV2_1.initializeV2("USD Coin");
-  console.log("init v2.1");
   await fiatTokenV2_1.initializeV2_1(THROWAWAY_ADDRESS);
 };
